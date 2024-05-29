@@ -1,0 +1,16 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "workout api",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node index.js",
+    "dev": "npm --watch start"
+  },
+  "author": "Leonardo Vitoriano",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
