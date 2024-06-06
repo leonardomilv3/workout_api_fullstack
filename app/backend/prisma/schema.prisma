@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CT {
+  id String @id @default(uuid())
+  nome String @unique
+  endereco String
+  proprietario String
+  createdAt DateTime @default(now())
+  createdBy String?
+}
+
+model Atleta {
+  id String @id @default(uuid())
+  cpf String @unique
+}
+
+model Categoria {
+  id String @id @default(uuid())
+  nome String @unique
+}
+
+
+
+// const AtletaSchema = z.object({
+//     id: z.string().uuid(),
+//     nome: z.string().min(3).max(50),
+//     cpf: z.string().min(11).max(11),
+//     idade: z.number().min(0).max(120),
+//     peso: z.number(),
+//     altura: z.number(),
+//     sexo: z.string().min(1).max(1),
+// })
+
+// const CategoriaSchema = z.object({
+//     id: z.string().uuid(),
+//     nome: z.string().min(3),
+// })

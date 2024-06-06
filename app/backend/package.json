@@ -2,15 +2,23 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "workout api",
-  "main": "index.js",
+  "main": "src/index.mjs",
+  "type": "module",
   "scripts": {
     "test": "npm test",
-    "start": "node index.js",
-    "dev": "npm --watch start"
+    "start": "node --env-file=.env src/index.mjs",
+    "dev": "nodemon --env-file=.env src/index.mjs"
   },
   "author": "Leonardo Vitoriano",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "node": "^20.14.0",
+    "nodemon": "^3.1.3",
+    "zod": "^3.23.8"
   }
 }
