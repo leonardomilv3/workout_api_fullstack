@@ -1,5 +1,6 @@
 import z from 'zod';
 import crypto from 'node:crypto';
+import prismaClient from '../utils/prismaClient.mjs';
 
 const centroTreinamentoSchema = z.object({
     id: z.string().min(5).max(20).uuid().optional(),
@@ -7,31 +8,37 @@ const centroTreinamentoSchema = z.object({
     endereco: z.string().min(5).max(60),
     proprietario: z.string().min(3).max(30),
     createdAt: z.date().optional(),
-    createdBy: z.string().optional()
-})
+});
 
 let centroTreinamentos = [];
 
 class CentroTreinamento {
 
-    index(request, response) {
+    async index(request, response) {
+
+        const centroTreinamentos = await prismaClient.cT.findMany();
+
         response.send(centroTreinamentos);
     }
     
-    getOne(request, response) {
+    async getOne(request, response) {
 
         const {id} = request.params;
 
-        const centroTreinamento = centroTreinamentos.find((ct) => { return ct.id === id });
-
-        if(!centroTreinamento){
+        try {
+            const centroTreinamento = await prismaClient.cT.findUnique({
+                where: {
+                    id
+                }
+            });
+            response.send({message: centroTreinamento});
+        } catch (error) {
             return response.status(400).send(`O CT com id: ${id} não foi encontrado`);
         }
 
-        response.send({message: centroTreinamento});
     }
 
-    store(request, response) {
+    async store(request, response) {
 
         const centroTreinamento = request.body;
 
@@ -45,18 +52,28 @@ class CentroTreinamento {
             return response.status(400).send(error);
         }
 
-        const [id] = crypto.randomUUID().split('-');
 
-        data.id = id;
-        data.createdAt = new Date();
-        data.createdBy = "System";
+        try {
 
-        centroTreinamentos.push(data);
+            const newCT = await prismaClient.cT.create({data: {
+                nome: data.nome,
+                endereco: data.endereco,
+                proprietario: data.proprietario
+            }});
 
-        response.send({message: 'store CT', body: data});
+            response.send({message: 'CT criado com sucesso!', body: newCT});
+
+        } catch (error){
+
+            response.status(404).send({message: error.message});
+        }
+        
+        
+        // delete newCT.createdAt, newCT.id;
+
     }
     
-    update(request, response) {
+    async update(request, response) {
         
         const {id} = request.params;
 
@@ -72,35 +89,43 @@ class CentroTreinamento {
             return response.status(400).send(error);
         }
 
-        const newCT = centroTreinamentos.map((ct) => {
-            if (ct.id === id){
-                return { 
-                    ...ct,
+        try {
+            
+            await prismaClient.cT.update({
+                where: {
+                    id
+                }, 
+                data: {
                     nome: data.nome,
                     endereco: data.endereco,
-                    proprietario: data.proprietario
-                };
-            }
+                    proprietario: data.proprietario,         
+                }
+            });
 
-            return ct;
-        });
+            response.send({message: "O CT foi atualizado!"});
 
-        centroTreinamentos = newCT;
+        } catch (error) {
+
+            response.send({message: `O CT com id: ${id} não existe.`});
+        }
         
-        response.send({message: "O CT foi atualizado!"});
     }
     
-    destroy(request, response) {
+    async destroy(request, response) {
 
         const {id} = request.params;
 
-        centroTreinamentos = centroTreinamentos.filter((ct) => { return (ct.id !== id) })
+        try {
+            await prismaClient.cT.delete({where: {id}})
 
-        if (centroTreinamentos.length === 0){
-            return response.status(404).send(`O CT com id: ${id} não existe.`)
+            response.status(204).send({message: "CT deletado com sucesso!"});
+
+        } catch (error) {
+
+            return response.status(404).send({message: `O CT com id: ${id} não existe.`});
+
         }
 
-        response.status(204).send();
     }
 }
 

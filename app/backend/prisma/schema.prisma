@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model CT {
@@ -19,32 +19,31 @@ model CT {
   endereco String
   proprietario String
   createdAt DateTime @default(now())
-  createdBy String?
-}
 
-model Atleta {
-  id String @id @default(uuid())
-  cpf String @unique
+  Atleta Atleta[]
 }
 
 model Categoria {
   id String @id @default(uuid())
   nome String @unique
+  createdAt DateTime @default(now())
+
+  Atleta Atleta[]
 }
 
+model Atleta {
+  id String @id @default(uuid())
+  cpf String @unique
+  nome String
+  idade Int
+  peso Float
+  altura Float
+  sexo String
+  createdAt DateTime @default(now())
+  
+  centro_treinamento CT @relation(fields: [ctId], references: [id])
+  ctId String
 
-
-// const AtletaSchema = z.object({
-//     id: z.string().uuid(),
-//     nome: z.string().min(3).max(50),
-//     cpf: z.string().min(11).max(11),
-//     idade: z.number().min(0).max(120),
-//     peso: z.number(),
-//     altura: z.number(),
-//     sexo: z.string().min(1).max(1),
-// })
-
-// const CategoriaSchema = z.object({
-//     id: z.string().uuid(),
-//     nome: z.string().min(3),
-// })
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId String
+}
