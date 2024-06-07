@@ -10,8 +10,6 @@ const centroTreinamentoSchema = z.object({
     createdAt: z.date().optional(),
 });
 
-let centroTreinamentos = [];
-
 class CentroTreinamento {
 
     async index(request, response) {
